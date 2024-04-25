@@ -390,6 +390,7 @@ export async function savePost(userId: string, postId: string) {
     console.log(error);
   }
 }
+
 // ============================== DELETE SAVED POST
 export async function deleteSavedPost(savedRecordId: string) {
   try {
@@ -397,6 +398,44 @@ export async function deleteSavedPost(savedRecordId: string) {
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
       savedRecordId
+    );
+
+    if (!statusCode) throw Error;
+
+    return { status: "Ok" };
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== FOLLOW USER
+export async function followUser(follower: string, following: string) {
+  try {
+    const follow = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      ID.unique(),
+      {
+        follower,
+        following,
+      }
+    );
+
+    if (!follow) throw Error;
+
+    return follow;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== UNFOLLOW USER
+export async function unfollowUser(follow: string) {
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.followsCollectionId,
+      follow
     );
 
     if (!statusCode) throw Error;

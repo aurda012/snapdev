@@ -10,8 +10,15 @@ import {
 import { Button } from "@/components/ui";
 import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queries";
+import {
+  useFollowUser,
+  useGetCurrentUser,
+  useGetUserById,
+  useUnfollowUser,
+} from "@/lib/react-query/queries";
 import { GridPostList, Loader } from "@/components/shared";
+import { useEffect, useState } from "react";
+import { Models } from "appwrite";
 
 interface StabBlockProps {
   value: string | number;
@@ -27,10 +34,34 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
 
 const Profile = () => {
   const { id } = useParams();
-  const { user } = useUserContext();
+  const { data: user } = useGetCurrentUser();
   const { pathname } = useLocation();
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const { mutate: followUser } = useFollowUser();
+  const { mutate: unfollowUser } = useUnfollowUser();
 
   const { data: currentUser } = useGetUserById(id || "");
+
+  const followingRecord = user?.follows.find(
+    (record: Models.Document) => record.following.$id === currentUser?.$id
+  );
+
+  useEffect(() => {
+    setIsFollowing(!!followingRecord);
+  }, [user, currentUser]);
+
+  const handleFollowUser = () => {
+    if (user && currentUser) {
+      if (followingRecord) {
+        unfollowUser(followingRecord.$id);
+        return setIsFollowing(false);
+      }
+
+      followUser({ follower: user.$id, following: currentUser.$id });
+      setIsFollowing(true);
+    }
+  };
 
   if (!currentUser)
     return (
@@ -62,8 +93,11 @@ const Profile = () => {
 
             <div className="flex gap-8 mt-10 items-center justify-center xl:justify-start flex-wrap z-20">
               <StatBlock value={currentUser.posts.length} label="Posts" />
-              <StatBlock value={20} label="Followers" />
-              <StatBlock value={20} label="Following" />
+              <StatBlock
+                value={currentUser.followers.length}
+                label="Followers"
+              />
+              <StatBlock value={currentUser.follows.length} label="Following" />
             </div>
 
             <p className="small-medium md:base-medium text-center xl:text-left mt-7 max-w-screen-sm">
@@ -77,7 +111,8 @@ const Profile = () => {
                 to={`/update-profile/${currentUser.$id}`}
                 className={`h-12 bg-dark-4 px-5 text-light-1 flex-center gap-2 rounded-lg ${
                   user.id !== currentUser.$id && "hidden"
-                }`}>
+                }`}
+              >
                 <img
                   src={"/assets/icons/edit.svg"}
                   alt="edit"
@@ -90,8 +125,17 @@ const Profile = () => {
               </Link>
             </div>
             <div className={`${user.id === id && "hidden"}`}>
-              <Button type="button" className="shad-button_primary px-8">
-                Follow
+              <Button
+                type="button"
+                size="sm"
+                className={`${
+                  isFollowing
+                    ? "shad-button_dark border-primary border-2"
+                    : "shad-button_primary"
+                } px-5`}
+                onClick={handleFollowUser}
+              >
+                {isFollowing ? "Following" : "Follow"}
               </Button>
             </div>
           </div>
@@ -104,7 +148,8 @@ const Profile = () => {
             to={`/profile/${id}`}
             className={`profile-tab rounded-l-lg ${
               pathname === `/profile/${id}` && "!bg-dark-3"
-            }`}>
+            }`}
+          >
             <img
               src={"/assets/icons/posts.svg"}
               alt="posts"
@@ -117,7 +162,8 @@ const Profile = () => {
             to={`/profile/${id}/liked-posts`}
             className={`profile-tab rounded-r-lg ${
               pathname === `/profile/${id}/liked-posts` && "!bg-dark-3"
-            }`}>
+            }`}
+          >
             <img
               src={"/assets/icons/like.svg"}
               alt="like"
