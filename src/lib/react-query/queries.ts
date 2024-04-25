@@ -30,7 +30,6 @@ import {
   createChat,
   getChat,
   createMessage,
-  getChatByUsers,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 
