@@ -10,6 +10,7 @@ import {
   PostDetails,
   Explore,
   AllUsers,
+  Profile,
 } from "./_root/pages";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
@@ -30,6 +31,7 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/all-users" element={<AllUsers />} />
+          <Route path="/profile/:id/*" element={<Profile />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />
           <Route path="/posts/:id" element={<PostDetails />} />
