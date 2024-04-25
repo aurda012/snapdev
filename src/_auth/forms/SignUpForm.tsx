@@ -1,9 +1,6 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
-import {
-  Link,
-  // useNavigate
-} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -16,20 +13,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// import Loader from "@/components/shared/Loader";
-// import { useToast } from "@/components/ui/use-toast";
+import Loader from "@/components/shared/Loader";
+import { useToast } from "@/components/ui/use-toast";
 
-// import {
-//   useCreateUserAccount,
-//   useSignInAccount,
-// } from "@/lib/react-query/queries";
+import {
+  useCreateUserAccount,
+  useSignInAccount,
+} from "@/lib/react-query/queries";
 import { SignupValidation } from "@/lib/validation";
-// import { useUserContext } from "@/context/AuthContext";
+import { useUserContext } from "@/context/AuthContext";
 
 const SignupForm = () => {
-  // const { toast } = useToast();
-  // const navigate = useNavigate();
-  // const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
 
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
@@ -42,37 +39,37 @@ const SignupForm = () => {
   });
 
   // Queries
-  // const { mutateAsync: createUserAccount, isLoading: isCreatingAccount } =
-  //   useCreateUserAccount();
-  // const { mutateAsync: signInAccount, isLoading: isSigningInUser } =
-  //   useSignInAccount();
+  const { mutateAsync: createUserAccount, isLoading: isCreatingAccount } =
+    useCreateUserAccount();
+  const { mutateAsync: signInAccount, isLoading: isSigningInUser } =
+    useSignInAccount();
 
   // Handler
   const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
     console.log(user);
     try {
-      // const newUser = await createUserAccount(user);
-      // if (!newUser) {
-      //   toast({ title: "Sign up failed. Please try again." });
-      //   return;
-      // }
-      // const session = await signInAccount({
-      //   email: user.email,
-      //   password: user.password,
-      // });
-      // if (!session) {
-      //   toast({ title: "Something went wrong. Please login your new account" });
-      //   navigate("/sign-in");
-      //   return;
-      // }
-      // const isLoggedIn = await checkAuthUser();
-      // if (isLoggedIn) {
-      //   form.reset();
-      //   navigate("/");
-      // } else {
-      //   toast({ title: "Login failed. Please try again." });
-      //   return;
-      // }
+      const newUser = await createUserAccount(user);
+      if (!newUser) {
+        toast({ title: "Sign up failed. Please try again." });
+        return;
+      }
+      const session = await signInAccount({
+        email: user.email,
+        password: user.password,
+      });
+      if (!session) {
+        toast({ title: "Something went wrong. Please login your new account" });
+        navigate("/sign-in");
+        return;
+      }
+      const isLoggedIn = await checkAuthUser();
+      if (isLoggedIn) {
+        form.reset();
+        navigate("/");
+      } else {
+        toast({ title: "Login failed. Please try again." });
+        return;
+      }
     } catch (error) {
       console.log({ error });
     }
@@ -151,14 +148,13 @@ const SignupForm = () => {
           />
 
           <Button type="submit" className="shad-button_primary">
-            {/* {isCreatingAccount || isSigningInUser || isUserLoading ? (
+            {isCreatingAccount || isSigningInUser || isUserLoading ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
             ) : (
               "Sign Up"
-            )} */}
-            Sign Up
+            )}
           </Button>
 
           <p className="text-small-regular text-light-2 text-center mt-2">
