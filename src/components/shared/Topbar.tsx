@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { useUserContext } from "@/context/AuthContext";
 import { useSignOutAccount } from "@/lib/react-query/queries";
 
-const Topbar = () => {
+const TopBar = () => {
   const navigate = useNavigate();
   const { user } = useUserContext();
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -30,7 +30,8 @@ const Topbar = () => {
           <Button
             variant="ghost"
             className="shad-button_ghost"
-            onClick={() => signOut()}>
+            onClick={() => signOut()}
+          >
             <img src="/assets/icons/logout.svg" alt="logout" />
           </Button>
           <Link to={`/profile/${user.id}`} className="flex-center gap-3">
@@ -46,4 +47,4 @@ const Topbar = () => {
   );
 };
 
-export default Topbar;
+export default TopBar;
