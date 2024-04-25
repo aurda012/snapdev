@@ -1,3 +1,4 @@
+import { Models } from "appwrite";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -59,4 +60,8 @@ export const checkIsLiked = (likeList: string[], userId: string) => {
 
 export const checkIsFollowing = (followers: string[], userId: string) => {
   return followers.includes(userId);
+};
+
+export const checkIfChatExists = (chats: Models.Document[], userId: string) => {
+  return chats.some((chat) => chat.users.includes(userId));
 };

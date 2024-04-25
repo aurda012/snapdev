@@ -27,6 +27,10 @@ import {
   deleteSavedPost,
   followUser,
   unfollowUser,
+  createChat,
+  getChat,
+  createMessage,
+  getChatByUsers,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 
@@ -205,6 +209,58 @@ export const useDeleteSavedPost = () => {
     },
   });
 };
+
+// CHATS
+
+export const useCreateChat = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ users }: { users: string[] }) => createChat(users),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID],
+      });
+    },
+  });
+};
+
+export const useGetChat = (chatId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CHAT, chatId],
+    queryFn: () => getUserById(chatId),
+    enabled: !!chatId,
+  });
+};
+
+// MESSAGES
+
+export const useCreateMessage = (chatId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      user,
+      chat,
+      text,
+    }: {
+      user: string;
+      chat: string;
+      text: string;
+    }) => createMessage(user, chat, text),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_USER],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CHAT, chatId],
+      });
+    },
+  });
+};
+
+// FOLLOWS
 
 export const useFollowUser = () => {
   const queryClient = useQueryClient();

@@ -5,12 +5,14 @@ import {
   Outlet,
   useParams,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 
 import { Button } from "@/components/ui";
 import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
 import {
+  useCreateChat,
   useFollowUser,
   useGetCurrentUser,
   useGetUserById,
@@ -19,6 +21,7 @@ import {
 import { GridPostList, Loader } from "@/components/shared";
 import { useEffect, useState } from "react";
 import { Models } from "appwrite";
+import { createChat, getChatByUser } from "@/lib/appwrite/api";
 
 interface StabBlockProps {
   value: string | number;
@@ -34,12 +37,14 @@ const StatBlock = ({ value, label }: StabBlockProps) => (
 
 const Profile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data: user } = useGetCurrentUser();
   const { pathname } = useLocation();
   const [isFollowing, setIsFollowing] = useState(false);
 
   const { mutate: followUser } = useFollowUser();
   const { mutate: unfollowUser } = useUnfollowUser();
+  // const { mutate: createChat } = useCreateChat();
 
   const { data: currentUser } = useGetUserById(id || "");
 
@@ -63,7 +68,17 @@ const Profile = () => {
     }
   };
 
-  if (!currentUser)
+  const handleCreateChat = async () => {
+    if (currentUser?.$id && user?.$id) {
+      // console.log("RAN");
+      // const chat = await createChat([currentUser.$id, user.$id]);
+      // console.log({ chat });
+      // const foundChat = await getChatByUser(user.$id);
+      // console.log({ foundChat });
+    }
+  };
+
+  if (!currentUser || !user)
     return (
       <div className="flex-center w-full h-full">
         <Loader />
@@ -106,11 +121,11 @@ const Profile = () => {
           </div>
 
           <div className="flex justify-center gap-4">
-            <div className={`${user.id !== currentUser.$id && "hidden"}`}>
+            <div className={`${id !== user.$id && "hidden"}`}>
               <Link
-                to={`/update-profile/${currentUser.$id}`}
+                to={`/update-profile/${user.$id}`}
                 className={`h-12 bg-dark-4 px-5 text-light-1 flex-center gap-2 rounded-lg ${
-                  user.id !== currentUser.$id && "hidden"
+                  id !== user.$id && "hidden"
                 }`}
               >
                 <img
@@ -124,7 +139,7 @@ const Profile = () => {
                 </p>
               </Link>
             </div>
-            <div className={`${user.id === id && "hidden"}`}>
+            <div className={`${user.$id === id && "hidden"}`}>
               <Button
                 type="button"
                 size="sm"
@@ -137,12 +152,20 @@ const Profile = () => {
               >
                 {isFollowing ? "Following" : "Follow"}
               </Button>
+              <Button
+                type="button"
+                size="sm"
+                className="shad-button_dark border-primary border-2 px-5 ml-2"
+                onClick={handleCreateChat}
+              >
+                Message
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {currentUser.$id === user.id && (
+      {currentUser.$id === id && (
         <div className="flex max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}
@@ -180,7 +203,7 @@ const Profile = () => {
           index
           element={<GridPostList posts={currentUser.posts} showUser={false} />}
         />
-        {currentUser.$id === user.id && (
+        {currentUser.$id === user.$id && (
           <Route path="/liked-posts" element={<LikedPosts />} />
         )}
       </Routes>

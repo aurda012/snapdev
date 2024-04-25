@@ -48,7 +48,6 @@ const Explore = () => {
       </div>
     );
 
-  console.log(searchValue);
   const shouldShowSearchResults = searchValue !== "";
   const shouldShowPosts =
     !shouldShowSearchResults &&

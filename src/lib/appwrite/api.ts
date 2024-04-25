@@ -370,6 +370,84 @@ export async function likePost(postId: string, likesArray: string[]) {
   }
 }
 
+// ============================== CREATE CHAT
+export async function createChat(users: string[]) {
+  try {
+    const chat = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.chatsCollectionId,
+      ID.unique(),
+      {
+        users,
+        userIds: users,
+      }
+    );
+
+    if (!chat) throw Error;
+
+    return chat;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== GET CHAT BY ID
+export async function getChat(chatId: string) {
+  try {
+    const chat = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.chatsCollectionId,
+      chatId
+    );
+
+    if (!chat) throw Error;
+
+    return chat;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== GET CHAT BY USERS
+export async function getChatByUser(user: string) {
+  try {
+    const chat = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.chatsCollectionId,
+      [Query.equal("userIds", [user]), Query.limit(1)]
+    );
+
+    if (!chat) throw Error;
+
+    return chat;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ============================== CREATE MESSAGE
+export async function createMessage(user: string, chat: string, text: string) {
+  try {
+    const message = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.messagesCollectionId,
+      ID.unique(),
+      {
+        user,
+        chat,
+        text,
+        created: new Date(),
+      }
+    );
+
+    if (!message) throw Error;
+
+    return message;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // ============================== SAVE POST
 export async function savePost(userId: string, postId: string) {
   try {
