@@ -5,16 +5,12 @@ import { useGetChats, useGetCurrentUser } from "@/lib/react-query/queries";
 const Chats = () => {
   const { data: currentUser, isLoading: isLoadingUser } = useGetCurrentUser();
 
-  console.log({ currentUser });
-
   const { data: chats, isLoading } = useGetChats(
     currentUser?.chats || [],
     currentUser?.$id
   );
 
   const defaultLayout = undefined;
-
-  console.log({ chats });
 
   return (
     <div className="common-container">

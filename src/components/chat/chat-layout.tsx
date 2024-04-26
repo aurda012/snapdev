@@ -29,7 +29,9 @@ export function ChatLayout({
   user,
 }: ChatLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
-  const [selectedChat, setSelectedChat] = React.useState(chats[0]);
+  const [selectedChat, setSelectedChat] = React.useState<Models.Document>(
+    chats[0]
+  );
   const [isMobile, setIsMobile] = useState(false);
 
   const currentUser = {
@@ -56,6 +58,13 @@ export function ChatLayout({
       window.removeEventListener("resize", checkScreenWidth);
     };
   }, []);
+
+  const handleSelectChat = (chat: string) => {
+    setSelectedChat((prev) => {
+      let newChat = chats.find((c) => c.$id === chat);
+      return { ...newChat, messages: newChat?.messages ?? [] };
+    });
+  };
 
   return (
     <ResizablePanelGroup
@@ -97,8 +106,10 @@ export function ChatLayout({
             messages: chat.messages ?? [],
             avatar: chat.avatar,
             variant: selectedChat.name === chat.name ? "grey" : "ghost",
+            id: chat.$id,
           }))}
           isMobile={isMobile}
+          setSelectedChat={handleSelectChat}
         />
       </ResizablePanel>
       <ResizableHandle withHandle />

@@ -73,11 +73,13 @@ const Profile = () => {
 
   const handleCreateChat = async () => {
     if (currentUser?.$id && user?.$id) {
-      // console.log("RAN");
-      // const chat = await createChat([currentUser.$id, user.$id]);
-      // console.log({ chat });
-      // const foundChat = await getChatByUser(user.$id);
-      // console.log({ foundChat });
+      if (existingChat) {
+        console.log("Chat exists", existingChat);
+        navigate(`/chats`);
+        return;
+      }
+      await createChat([currentUser.$id, user.$id]);
+      navigate(`/chats`);
     }
   };
 
@@ -142,7 +144,7 @@ const Profile = () => {
                 </p>
               </Link>
             </div>
-            <div className={`${user.$id === id && "hidden"}`}>
+            <div className={`${user.$id === id && "hidden"} flex`}>
               <Button
                 type="button"
                 size="sm"

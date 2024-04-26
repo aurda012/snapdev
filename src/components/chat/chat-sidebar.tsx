@@ -20,12 +20,19 @@ interface SidebarProps {
     messages: Message[];
     avatar: string;
     variant: "grey" | "ghost";
+    id: string;
   }[];
   onClick?: () => void;
   isMobile: boolean;
+  setSelectedChat: (chat: any) => void;
 }
 
-export function Sidebar({ links, isCollapsed, isMobile }: SidebarProps) {
+export function Sidebar({
+  links,
+  isCollapsed,
+  isMobile,
+  setSelectedChat,
+}: SidebarProps) {
   return (
     <div
       data-collapsed={isCollapsed}
@@ -100,6 +107,7 @@ export function Sidebar({ links, isCollapsed, isMobile }: SidebarProps) {
             <Link
               key={index}
               to="#"
+              onClick={() => setSelectedChat(link.id)}
               className={cn(
                 buttonVariants({ variant: link.variant, size: "xl" }),
                 link.variant === "grey" &&
