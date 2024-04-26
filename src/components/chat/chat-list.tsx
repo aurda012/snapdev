@@ -4,19 +4,23 @@ import React, { useRef } from "react";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import ChatBottombar from "./chat-bottombar";
 import { AnimatePresence, motion } from "framer-motion";
+import { Models } from "appwrite";
+import { IUser } from "@/types";
 
 interface ChatListProps {
   messages?: Message[];
-  selectedUser: UserData;
+  selectedChat: Models.Document;
   sendMessage: (newMessage: Message) => void;
   isMobile: boolean;
+  currentUser: IUser;
 }
 
 export function ChatList({
   messages,
-  selectedUser,
+  selectedChat,
   sendMessage,
   isMobile,
+  currentUser,
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -55,28 +59,28 @@ export function ChatList({
               }}
               className={cn(
                 "flex flex-col gap-2 p-4 whitespace-pre-wrap",
-                message.name !== selectedUser.name ? "items-end" : "items-start"
+                message.userId === currentUser.id ? "items-end" : "items-start"
               )}
             >
               <div className="flex gap-3 items-center">
-                {message.name === selectedUser.name && (
+                {message.userId !== currentUser.id && (
                   <Avatar className="flex justify-center items-center">
                     <AvatarImage
-                      src={message.avatar}
-                      alt={message.name}
+                      src={selectedChat.avatar}
+                      alt={selectedChat.name}
                       width={6}
                       height={6}
                     />
                   </Avatar>
                 )}
                 <span className=" bg-neutral-500 p-3 rounded-md max-w-xs">
-                  {message.message}
+                  {message.text}
                 </span>
-                {message.name !== selectedUser.name && (
+                {message.userId === currentUser.id && (
                   <Avatar className="flex justify-center items-center">
                     <AvatarImage
-                      src={message.avatar}
-                      alt={message.name}
+                      src={currentUser.imageUrl}
+                      alt={currentUser.name}
                       width={6}
                       height={6}
                     />
@@ -87,7 +91,12 @@ export function ChatList({
           ))}
         </AnimatePresence>
       </div>
-      <ChatBottombar sendMessage={sendMessage} isMobile={isMobile} />
+      <ChatBottombar
+        sendMessage={sendMessage}
+        isMobile={isMobile}
+        chatId={selectedChat.$id}
+        userId={currentUser.id}
+      />
     </div>
   );
 }

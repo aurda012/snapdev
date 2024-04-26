@@ -10,21 +10,35 @@ import {
 import { cn } from "@/lib/utils";
 import { Sidebar } from "./chat-sidebar";
 import { Chat } from "./chat";
+import { Models } from "appwrite";
+import { IUser } from "@/types";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
+  chats: Models.Document[];
+  user: Models.Document;
 }
 
 export function ChatLayout({
   defaultLayout = [320, 480],
   defaultCollapsed = false,
   navCollapsedSize,
+  chats,
+  user,
 }: ChatLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
-  const [selectedUser, setSelectedUser] = React.useState(userData[0]);
+  const [selectedChat, setSelectedChat] = React.useState(chats[0]);
   const [isMobile, setIsMobile] = useState(false);
+
+  const currentUser = {
+    id: user.$id,
+    name: user.name,
+    username: user.username,
+    email: user.email,
+    imageUrl: user.imageUrl,
+  } as IUser;
 
   useEffect(() => {
     const checkScreenWidth = () => {
@@ -78,11 +92,11 @@ export function ChatLayout({
       >
         <Sidebar
           isCollapsed={isCollapsed || isMobile}
-          links={userData.map((user) => ({
-            name: user.name,
-            messages: user.messages ?? [],
-            avatar: user.avatar,
-            variant: selectedUser.name === user.name ? "grey" : "ghost",
+          links={chats.map((chat) => ({
+            name: chat.name,
+            messages: chat.messages ?? [],
+            avatar: chat.avatar,
+            variant: selectedChat.name === chat.name ? "grey" : "ghost",
           }))}
           isMobile={isMobile}
         />
@@ -90,9 +104,10 @@ export function ChatLayout({
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
         <Chat
-          messages={selectedUser.messages}
-          selectedUser={selectedUser}
+          messages={selectedChat.messages}
+          selectedChat={selectedChat}
           isMobile={isMobile}
+          currentUser={currentUser}
         />
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -22,6 +22,7 @@ import { GridPostList, Loader } from "@/components/shared";
 import { useEffect, useState } from "react";
 import { Models } from "appwrite";
 import { createChat, getChatByUser } from "@/lib/appwrite/api";
+import { checkIfChatExists } from "@/lib/utils";
 
 interface StabBlockProps {
   value: string | number;
@@ -51,6 +52,8 @@ const Profile = () => {
   const followingRecord = user?.follows.find(
     (record: Models.Document) => record.following.$id === currentUser?.$id
   );
+
+  const existingChat = checkIfChatExists(user?.chats || [], currentUser?.$id);
 
   useEffect(() => {
     setIsFollowing(!!followingRecord);
@@ -165,7 +168,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {currentUser.$id === id && (
+      {user.$id === id && (
         <div className="flex max-w-5xl w-full">
           <Link
             to={`/profile/${id}`}

@@ -62,6 +62,6 @@ export const checkIsFollowing = (followers: string[], userId: string) => {
   return followers.includes(userId);
 };
 
-export const checkIfChatExists = (chats: Models.Document[], userId: string) => {
-  return chats.some((chat) => chat.users.includes(userId));
+export const checkIfChatExists = (chats: Models.Document[], user: string) => {
+  return chats.find((chat) => chat.userIds.includes(user));
 };

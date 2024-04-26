@@ -89,10 +89,10 @@ export const loggedInUserData = {
 export type LoggedInUserData = typeof loggedInUserData;
 
 export interface Message {
-  id: number;
-  avatar: string;
-  name: string;
-  message: string;
+  id: string;
+  chatId: string;
+  userId: string;
+  text: string;
 }
 
 export interface User {

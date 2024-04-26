@@ -1,7 +1,8 @@
-import { ID, Query } from "appwrite";
+import { ID, Models, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import { Message } from "../data";
 
 // ============================================================
 // AUTH
@@ -391,6 +392,46 @@ export async function createChat(users: string[]) {
   }
 }
 
+// ============================== GET CHATS
+
+export async function getUserForChat(userId: string) {
+  try {
+    const user = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      userId
+    );
+
+    if (!user) throw Error;
+
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getChats(chats: Models.Document[], currentUser: string) {
+  try {
+    const chatsWithUsers = await Promise.all(
+      chats.map(async (chat) => {
+        const userId = chat.userIds.find((id) => id !== currentUser);
+        const user = await getUserById(userId);
+        return {
+          ...chat,
+          userId: user.$id,
+          name: user.name,
+          username: user.username,
+          avatar: user.imageUrl,
+        };
+      })
+    );
+
+    return chatsWithUsers;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // ============================== GET CHAT BY ID
 export async function getChat(chatId: string) {
   try {
@@ -426,23 +467,23 @@ export async function getChatByUser(user: string) {
 }
 
 // ============================== CREATE MESSAGE
-export async function createMessage(user: string, chat: string, text: string) {
+export async function createMessage(message: Message) {
   try {
-    const message = await databases.createDocument(
+    const createdMessage = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.messagesCollectionId,
-      ID.unique(),
+      message.id,
       {
-        user,
-        chat,
-        text,
+        userId: message.userId,
+        chatId: message.chatId,
+        text: message.text,
         created: new Date(),
       }
     );
 
-    if (!message) throw Error;
+    if (!createdMessage) throw Error;
 
-    return message;
+    return createdMessage;
   } catch (error) {
     console.log(error);
   }

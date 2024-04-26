@@ -6,6 +6,7 @@ import {
   SendHorizontal,
   ThumbsUp,
 } from "lucide-react";
+import { v4 as uuid } from "uuid";
 import { Link } from "react-router-dom";
 import React, { useRef, useState } from "react";
 import { buttonVariants } from "../ui/button";
@@ -19,6 +20,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 interface ChatBottombarProps {
   sendMessage: (newMessage: Message) => void;
   isMobile: boolean;
+  chatId: string;
+  userId: string;
 }
 
 export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
@@ -26,6 +29,8 @@ export const BottombarIcons = [{ icon: FileImage }, { icon: Paperclip }];
 export default function ChatBottombar({
   sendMessage,
   isMobile,
+  chatId,
+  userId,
 }: ChatBottombarProps) {
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -36,10 +41,10 @@ export default function ChatBottombar({
 
   const handleThumbsUp = () => {
     const newMessage: Message = {
-      id: message.length + 1,
-      name: loggedInUserData.name,
-      avatar: loggedInUserData.avatar,
-      message: "👍",
+      id: uuid(),
+      userId,
+      chatId,
+      text: "👍",
     };
     sendMessage(newMessage);
     setMessage("");
@@ -48,10 +53,10 @@ export default function ChatBottombar({
   const handleSend = () => {
     if (message.trim()) {
       const newMessage: Message = {
-        id: message.length + 1,
-        name: loggedInUserData.name,
-        avatar: loggedInUserData.avatar,
-        message: message.trim(),
+        id: uuid(),
+        userId,
+        chatId,
+        text: message.trim(),
       };
       sendMessage(newMessage);
       setMessage("");

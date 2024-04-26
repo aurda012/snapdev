@@ -20,5 +20,6 @@ export enum QUERY_KEYS {
 
   // CHAT KEYS
   GET_CHAT = "getChat",
+  GET_CHATS = "getChats",
   GET_CHAT_BY_USERS = "getChatByUsers",
 }

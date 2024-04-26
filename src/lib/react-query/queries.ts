@@ -30,8 +30,11 @@ import {
   createChat,
   getChat,
   createMessage,
+  getChats,
 } from "@/lib/appwrite/api";
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import { Models } from "appwrite";
+import { Message } from "../data";
 
 // ============================================================
 // AUTH QUERIES
@@ -211,6 +214,13 @@ export const useDeleteSavedPost = () => {
 
 // CHATS
 
+export const useGetChats = (chats: Models.Document[], currentUser: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CHATS, currentUser],
+    queryFn: () => getChats(chats, currentUser),
+  });
+};
+
 export const useCreateChat = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -226,28 +236,12 @@ export const useCreateChat = () => {
   });
 };
 
-export const useGetChat = (chatId: string) => {
-  return useQuery({
-    queryKey: [QUERY_KEYS.GET_CHAT, chatId],
-    queryFn: () => getUserById(chatId),
-    enabled: !!chatId,
-  });
-};
-
 // MESSAGES
 
 export const useCreateMessage = (chatId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      user,
-      chat,
-      text,
-    }: {
-      user: string;
-      chat: string;
-      text: string;
-    }) => createMessage(user, chat, text),
+    mutationFn: (message: Message) => createMessage(message),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_USER],
