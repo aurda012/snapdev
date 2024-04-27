@@ -115,7 +115,6 @@ export function ChatLayout({
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
         <Chat
-          messages={selectedChat.messages}
           selectedChat={selectedChat}
           isMobile={isMobile}
           currentUser={currentUser}

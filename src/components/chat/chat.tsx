@@ -1,27 +1,25 @@
 import { Message, UserData } from "@/lib/data";
 import ChatTopbar from "./chat-topbar";
 import { ChatList } from "./chat-list";
-import React from "react";
+import React, { useEffect } from "react";
 import { Models } from "appwrite";
 import { IUser } from "@/types";
 import { useCreateMessage } from "@/lib/react-query/queries";
 
 interface ChatProps {
-  messages?: Message[];
   selectedChat: Models.Document;
   isMobile: boolean;
   currentUser: IUser;
 }
 
-export function Chat({
-  messages,
-  selectedChat,
-  isMobile,
-  currentUser,
-}: ChatProps) {
+export function Chat({ selectedChat, isMobile, currentUser }: ChatProps) {
   const [messagesState, setMessages] = React.useState<Message[]>(
-    messages ?? []
+    selectedChat.messages ?? []
   );
+
+  useEffect(() => {
+    setMessages(selectedChat.messages ?? []);
+  }, [selectedChat]);
 
   const { data: message, mutate: createMessage } = useCreateMessage(
     selectedChat.$id
